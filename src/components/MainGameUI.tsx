@@ -6,6 +6,9 @@ import { Card } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import dungeonBg from '@/assets/dungeon-bg.jpg';
+import AdventureLogModal from '@/components/AdventureLogModal';
+import InventoryModal from '@/components/InventoryModal';
+import { toast } from 'sonner';
 import {
   Sword,
   Shield,
@@ -15,6 +18,11 @@ import {
   Book,
   ArrowUp,
   Play,
+  Settings,
+  LogOut,
+  Save,
+  HelpCircle,
+  Menu,
 } from 'lucide-react';
 
 const MainGameUI = () => {
@@ -26,10 +34,15 @@ const MainGameUI = () => {
     currentEnemy,
     updateStory,
     setPlayerChoices,
+    setScreen,
+    resetGame,
   } = useGameStore();
 
   const [displayedText, setDisplayedText] = useState('');
   const [isTyping, setIsTyping] = useState(false);
+  const [showAdventureLog, setShowAdventureLog] = useState(false);
+  const [showInventory, setShowInventory] = useState(false);
+  const [showMenu, setShowMenu] = useState(false);
 
   // Initial story
   useEffect(() => {
@@ -74,6 +87,28 @@ const MainGameUI = () => {
     ]);
   };
 
+  const handleSaveGame = () => {
+    // Placeholder: In production, save to MongoDB
+    localStorage.setItem('gameState', JSON.stringify(useGameStore.getState()));
+    toast.success('Game saved successfully!');
+  };
+
+  const handleExitGame = () => {
+    if (window.confirm('Are you sure you want to exit? Make sure to save your progress!')) {
+      setScreen('intro');
+    }
+  };
+
+  const handleOpenSettings = () => {
+    setScreen('settings');
+  };
+
+  const handleHelp = () => {
+    toast.info('Controls: Use the action buttons below to interact with the game. Make choices to progress your story!', {
+      duration: 5000,
+    });
+  };
+
   if (!player) return null;
 
   const healthPercentage = (player.health / player.maxHealth) * 100;
@@ -81,6 +116,16 @@ const MainGameUI = () => {
 
   return (
     <div className="relative min-h-screen overflow-hidden">
+      {/* Modals */}
+      <AdventureLogModal
+        isOpen={showAdventureLog}
+        onClose={() => setShowAdventureLog(false)}
+      />
+      <InventoryModal
+        isOpen={showInventory}
+        onClose={() => setShowInventory(false)}
+      />
+
       {/* Parallax Background */}
       <motion.div
         className="absolute inset-0 z-0"
@@ -133,11 +178,59 @@ const MainGameUI = () => {
 
             {/* Quick Actions */}
             <div className="flex gap-2">
-              <Button variant="outline" size="icon" className="hover:bg-primary/10">
+              <Button
+                variant="outline"
+                size="icon"
+                className="hover:bg-primary/10"
+                onClick={() => setShowInventory(true)}
+                title="Inventory"
+              >
                 <Package className="w-5 h-5" />
               </Button>
-              <Button variant="outline" size="icon" className="hover:bg-primary/10">
+              <Button
+                variant="outline"
+                size="icon"
+                className="hover:bg-primary/10"
+                onClick={() => setShowAdventureLog(true)}
+                title="Adventure Log"
+              >
                 <Book className="w-5 h-5" />
+              </Button>
+              <Button
+                variant="outline"
+                size="icon"
+                className="hover:bg-primary/10"
+                onClick={handleSaveGame}
+                title="Save Game"
+              >
+                <Save className="w-5 h-5" />
+              </Button>
+              <Button
+                variant="outline"
+                size="icon"
+                className="hover:bg-primary/10"
+                onClick={handleHelp}
+                title="Help"
+              >
+                <HelpCircle className="w-5 h-5" />
+              </Button>
+              <Button
+                variant="outline"
+                size="icon"
+                className="hover:bg-primary/10"
+                onClick={handleOpenSettings}
+                title="Settings"
+              >
+                <Settings className="w-5 h-5" />
+              </Button>
+              <Button
+                variant="outline"
+                size="icon"
+                className="hover:bg-destructive/20 border-destructive/30"
+                onClick={handleExitGame}
+                title="Exit Game"
+              >
+                <LogOut className="w-5 h-5 text-destructive" />
               </Button>
             </div>
           </div>
@@ -231,6 +324,7 @@ const MainGameUI = () => {
                 <Button
                   variant="outline"
                   className="h-20 flex flex-col items-center justify-center gap-2 hover:bg-destructive/20 border-destructive/30"
+                  onClick={() => toast.info('Combat action - Coming soon!')}
                 >
                   <Sword className="w-6 h-6" />
                   <span className="text-xs">Attack</span>
@@ -238,6 +332,7 @@ const MainGameUI = () => {
                 <Button
                   variant="outline"
                   className="h-20 flex flex-col items-center justify-center gap-2 hover:bg-secondary/20 border-secondary/30"
+                  onClick={() => toast.info('Defense action - Coming soon!')}
                 >
                   <Shield className="w-6 h-6" />
                   <span className="text-xs">Defend</span>
@@ -245,6 +340,7 @@ const MainGameUI = () => {
                 <Button
                   variant="outline"
                   className="h-20 flex flex-col items-center justify-center gap-2 hover:bg-primary/20 border-primary/30"
+                  onClick={() => setShowInventory(true)}
                 >
                   <Package className="w-6 h-6" />
                   <span className="text-xs">Use Item</span>
@@ -252,6 +348,7 @@ const MainGameUI = () => {
                 <Button
                   variant="outline"
                   className="h-20 flex flex-col items-center justify-center gap-2 hover:bg-accent/20 border-accent/30"
+                  onClick={() => toast.info('Jump action - Coming soon!')}
                 >
                   <ArrowUp className="w-6 h-6" />
                   <span className="text-xs">Jump</span>
