@@ -20,6 +20,7 @@ import { AchievementGallery } from '@/components/AchievementNotification';
 import { storage, setupAutoSave } from '@/utils/storage';
 import { useTranslation } from 'react-i18next';
 import { toast } from 'sonner';
+import { api } from '@/services/api';
 import {
   Sword,
   Shield,
@@ -49,8 +50,13 @@ const MainGameUI = () => {
     playerChoices,
     inCombat,
     currentEnemy,
+    storyLog,
+    genre,
     updateStory,
     setPlayerChoices,
+    addStoryEvent,
+    startCombat,
+    addItem,
     setScreen,
     resetGame,
   } = useGameStore();
@@ -67,6 +73,7 @@ const MainGameUI = () => {
   const [showTutorial, setShowTutorial] = useState(false);
   const [showMenu, setShowMenu] = useState(false);
   const [activeTab, setActiveTab] = useState('stats');
+  const [loadingStory, setLoadingStory] = useState(false);
 
   // Auto-save setup
   useEffect(() => {
@@ -114,15 +121,59 @@ const MainGameUI = () => {
     return () => clearInterval(interval);
   }, [currentStory]);
 
-  const handleChoice = (choice: string) => {
-    // Placeholder: In production, this would call the backend API
-    const mockResponse = `You chose to ${choice.toLowerCase()}. As you venture forward, you encounter a mysterious figure shrouded in shadow. The figure speaks in a deep, resonant voice...`;
-    updateStory(mockResponse);
-    setPlayerChoices([
-      'Approach cautiously',
-      'Draw your weapon',
-      'Retreat quietly',
-    ]);
+  const handleChoice = async (choice: string) => {
+    if (!player) return;
+    // Prevent concurrent requests
+    if (loadingStory) return;
+    setLoadingStory(true);
+    // Clear choices while waiting for backend
+    setPlayerChoices([]);
+    try {
+      // Prepare request object
+      const request = {
+        player,
+        genre: genre || 'Fantasy',
+        previousEvents: storyLog || [],
+        choice,
+      };
+
+      // Call backend (or fallback mock inside api.generateStory handles errors)
+  const res = await api.generateStory(request as any);
+
+      // Update story and choices
+      if (res.story) {
+        updateStory(res.story);
+        addStoryEvent({ text: res.story, type: 'story' });
+      }
+
+      if (res.choices && Array.isArray(res.choices)) {
+        setPlayerChoices(res.choices);
+      } else {
+        setPlayerChoices([]);
+      }
+
+      // If an enemy is returned, start combat
+      if ((res as any).enemy) {
+        try {
+          startCombat((res as any).enemy as any);
+        } catch (e) {
+          console.warn('Failed to start combat from response', e);
+        }
+      }
+
+      // Add any items returned
+      if (res.items && Array.isArray(res.items)) {
+        res.items.forEach((it: any) => addItem(it));
+      }
+    } catch (error) {
+      console.error('Error generating story:', error);
+      toast.error('Failed to get story from server. Using fallback.');
+      // Fallback minimal behavior
+      updateStory(`You chose to ${choice.toLowerCase()}. The path continues...`);
+      setPlayerChoices(['Approach cautiously', 'Draw your weapon', 'Retreat quietly']);
+    } finally {
+      setLoadingStory(false);
+    }
   };
 
   const handleSaveGame = () => {
@@ -385,7 +436,10 @@ const MainGameUI = () => {
                   <Button
                     key={index}
                     onClick={() => handleChoice(choice)}
-                    className="w-full justify-start text-left h-auto py-4 px-6 bg-primary/10 hover:bg-primary/20 border-2 border-primary/30 hover:border-primary transition-all duration-300 group"
+                    disabled={loadingStory}
+                    className={`w-full justify-start text-left h-auto py-4 px-6 bg-primary/10 hover:bg-primary/20 border-2 border-primary/30 hover:border-primary transition-all duration-300 group ${
+                      loadingStory ? 'opacity-60 cursor-not-allowed' : ''
+                    }`}
                     variant="outline"
                   >
                     <Play className="w-4 h-4 mr-3 group-hover:translate-x-1 transition-transform" />

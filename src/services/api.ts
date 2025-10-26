@@ -78,14 +78,35 @@ export const api = {
       return await response.json();
     } catch (error) {
       console.error('Story generation failed:', error);
-      // Return mock data for offline mode
+      // Return dynamic mock data for offline mode based on the request to make local testing richer
+      const choiceText = request?.choice || '';
+      const previous = request?.previousEvents?.map((e) => e.text).join(' ') || '';
+      const seed = Math.abs(
+        (choiceText + previous + Date.now().toString()).split('').reduce((acc, ch) => acc + ch.charCodeAt(0), 0)
+      );
+      const pick = seed % 3;
+
+      if (choiceText.toLowerCase().includes('left') || pick === 0) {
+        return {
+          story: `You chose to ${choiceText.toLowerCase() || 'explore left'}. The corridor narrows and the torches dim—something moves in the gloom. Suddenly, a snarling goblinoid lunges from the shadows! Combat is joined.`,
+            choices: ['Attack the creature', 'Try to talk to it', 'Attempt to flee'],
+            enemy: { id: 'goblin_1', name: 'Goblin Scout', health: 28, maxHealth: 28, attack: 7, defense: 3, position: { x: 0, y: 0 } },
+          items: [],
+        };
+      }
+
+      if (choiceText.toLowerCase().includes('center') || pick === 1) {
+        return {
+          story: `You chose to ${choiceText.toLowerCase() || 'investigate the center'}. The air smells of old incense. A small chest sits half-buried beneath rubble; inside you find a glittering potion and a weathered note.`,
+          choices: ['Drink the potion', 'Read the note', 'Leave it be'],
+          items: [{ id: 'potion_minor', name: 'Minor Health Potion', type: 'potion', effect: 'Restores 30 HP', quantity: 1 }],
+        };
+      }
+
+      // Default/Right path or rest
       return {
-        story: 'You venture deeper into the unknown. The path ahead splits in multiple directions...',
-        choices: [
-          'Take the left path through the dark forest',
-          'Follow the right path toward the mountains',
-          'Rest and examine your surroundings',
-        ],
+        story: `You chose to ${choiceText.toLowerCase() || 'take the right path'}. The corridor opens into a quiet chamber with murals telling an ancient tale. You feel the weight of destiny — could this be a turning point?`,
+        choices: ['Study the murals', 'Set up camp and rest', 'Search for secret doors'],
       };
     }
   },

@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 64 64" fill="none">
+  <rect width="64" height="64" rx="12" fill="#0f172a"/>
+  <!-- simple game controller icon -->
+  <path d="M20 38c-4 0-6-3-6-6 0-3 2-8 8-8h20c6 0 8 5 8 8 0 3-2 6-6 6H20z" fill="#111827"/>
+  <path d="M20 36h24c5 0 7-3 7-5 0-3-2-6-7-6H28c-6 0-8 5-8 8 0 2 1 3 2 3z" fill="#f97316" opacity="0.95"/>
+  <circle cx="26" cy="30" r="2" fill="#fff"/>
+  <circle cx="34" cy="30" r="2" fill="#fff"/>
+  <rect x="30" y="34" width="4" height="2" rx="1" fill="#fff"/>
+  <!-- left D-pad -->
+  <rect x="18" y="26" width="2" height="6" rx="1" fill="#fff"/>
+  <rect x="16" y="28" width="6" height="2" rx="1" fill="#fff"/>
+</svg>
