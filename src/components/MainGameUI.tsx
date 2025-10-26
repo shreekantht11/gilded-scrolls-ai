@@ -5,9 +5,20 @@ import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
 import { ScrollArea } from '@/components/ui/scroll-area';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import dungeonBg from '@/assets/dungeon-bg.jpg';
 import AdventureLogModal from '@/components/AdventureLogModal';
 import InventoryModal from '@/components/InventoryModal';
+import CombatPanel from '@/components/CombatPanel';
+import QuestTracker from '@/components/QuestTracker';
+import CharacterSheet from '@/components/CharacterSheet';
+import WorldMapModal from '@/components/WorldMapModal';
+import Statistics from '@/components/Statistics';
+import ShareModal from '@/components/ShareModal';
+import Tutorial from '@/components/Tutorial';
+import { AchievementGallery } from '@/components/AchievementNotification';
+import { storage, setupAutoSave } from '@/utils/storage';
+import { useTranslation } from 'react-i18next';
 import { toast } from 'sonner';
 import {
   Sword,
@@ -23,6 +34,12 @@ import {
   Save,
   HelpCircle,
   Menu,
+  Map,
+  BarChart3,
+  Share2,
+  Trophy,
+  Target,
+  User,
 } from 'lucide-react';
 
 const MainGameUI = () => {
@@ -38,11 +55,32 @@ const MainGameUI = () => {
     resetGame,
   } = useGameStore();
 
+  const { t } = useTranslation();
   const [displayedText, setDisplayedText] = useState('');
   const [isTyping, setIsTyping] = useState(false);
   const [showAdventureLog, setShowAdventureLog] = useState(false);
   const [showInventory, setShowInventory] = useState(false);
+  const [showWorldMap, setShowWorldMap] = useState(false);
+  const [showStatistics, setShowStatistics] = useState(false);
+  const [showShare, setShowShare] = useState(false);
+  const [showAchievements, setShowAchievements] = useState(false);
+  const [showTutorial, setShowTutorial] = useState(false);
   const [showMenu, setShowMenu] = useState(false);
+  const [activeTab, setActiveTab] = useState('stats');
+
+  // Auto-save setup
+  useEffect(() => {
+    const cleanup = setupAutoSave(() => useGameStore.getState());
+    return cleanup;
+  }, []);
+
+  // Check tutorial
+  useEffect(() => {
+    const tutorialCompleted = localStorage.getItem('tutorial_completed');
+    if (!tutorialCompleted) {
+      setShowTutorial(true);
+    }
+  }, []);
 
   // Initial story
   useEffect(() => {
@@ -88,9 +126,17 @@ const MainGameUI = () => {
   };
 
   const handleSaveGame = () => {
-    // Placeholder: In production, save to MongoDB
-    localStorage.setItem('gameState', JSON.stringify(useGameStore.getState()));
-    toast.success('Game saved successfully!');
+    const state = useGameStore.getState();
+    const success = storage.saveToSlot(
+      'manual-save',
+      `${player?.name} - Level ${player?.level}`,
+      state
+    );
+    if (success) {
+      toast.success(t('messages.gameSaved'));
+    } else {
+      toast.error('Failed to save game');
+    }
   };
 
   const handleExitGame = () => {
@@ -116,6 +162,14 @@ const MainGameUI = () => {
 
   return (
     <div className="relative min-h-screen overflow-hidden">
+      {/* Tutorial */}
+      {showTutorial && <Tutorial onComplete={() => setShowTutorial(false)} />}
+
+      {/* Combat Panel */}
+      <AnimatePresence>
+        {inCombat && <CombatPanel />}
+      </AnimatePresence>
+
       {/* Modals */}
       <AdventureLogModal
         isOpen={showAdventureLog}
@@ -124,6 +178,22 @@ const MainGameUI = () => {
       <InventoryModal
         isOpen={showInventory}
         onClose={() => setShowInventory(false)}
+      />
+      <Statistics
+        isOpen={showStatistics}
+        onClose={() => setShowStatistics(false)}
+      />
+      <ShareModal
+        isOpen={showShare}
+        onClose={() => setShowShare(false)}
+      />
+      <AchievementGallery
+        isOpen={showAchievements}
+        onClose={() => setShowAchievements(false)}
+      />
+      <WorldMapModal
+        isOpen={showWorldMap}
+        onClose={() => setShowWorldMap(false)}
       />
 
       {/* Parallax Background */}
@@ -183,7 +253,7 @@ const MainGameUI = () => {
                 size="icon"
                 className="hover:bg-primary/10"
                 onClick={() => setShowInventory(true)}
-                title="Inventory"
+                title={t('game.inventory')}
               >
                 <Package className="w-5 h-5" />
               </Button>
@@ -192,7 +262,7 @@ const MainGameUI = () => {
                 size="icon"
                 className="hover:bg-primary/10"
                 onClick={() => setShowAdventureLog(true)}
-                title="Adventure Log"
+                title={t('game.log')}
               >
                 <Book className="w-5 h-5" />
               </Button>
@@ -200,8 +270,44 @@ const MainGameUI = () => {
                 variant="outline"
                 size="icon"
                 className="hover:bg-primary/10"
+                onClick={() => setShowWorldMap(true)}
+                title={t('game.map')}
+              >
+                <Map className="w-5 h-5" />
+              </Button>
+              <Button
+                variant="outline"
+                size="icon"
+                className="hover:bg-primary/10"
+                onClick={() => setShowStatistics(true)}
+                title="Statistics"
+              >
+                <BarChart3 className="w-5 h-5" />
+              </Button>
+              <Button
+                variant="outline"
+                size="icon"
+                className="hover:bg-primary/10"
+                onClick={() => setShowAchievements(true)}
+                title={t('game.achievements')}
+              >
+                <Trophy className="w-5 h-5" />
+              </Button>
+              <Button
+                variant="outline"
+                size="icon"
+                className="hover:bg-primary/10"
+                onClick={() => setShowShare(true)}
+                title="Share"
+              >
+                <Share2 className="w-5 h-5" />
+              </Button>
+              <Button
+                variant="outline"
+                size="icon"
+                className="hover:bg-primary/10"
                 onClick={handleSaveGame}
-                title="Save Game"
+                title={t('game.save')}
               >
                 <Save className="w-5 h-5" />
               </Button>
@@ -210,7 +316,7 @@ const MainGameUI = () => {
                 size="icon"
                 className="hover:bg-primary/10"
                 onClick={handleHelp}
-                title="Help"
+                title={t('game.help')}
               >
                 <HelpCircle className="w-5 h-5" />
               </Button>
@@ -219,7 +325,7 @@ const MainGameUI = () => {
                 size="icon"
                 className="hover:bg-primary/10"
                 onClick={handleOpenSettings}
-                title="Settings"
+                title={t('game.settings')}
               >
                 <Settings className="w-5 h-5" />
               </Button>
@@ -228,7 +334,7 @@ const MainGameUI = () => {
                 size="icon"
                 className="hover:bg-destructive/20 border-destructive/30"
                 onClick={handleExitGame}
-                title="Exit Game"
+                title={t('game.exit')}
               >
                 <LogOut className="w-5 h-5 text-destructive" />
               </Button>
@@ -292,29 +398,64 @@ const MainGameUI = () => {
 
           {/* Stats & Actions Panel (Right) */}
           <div className="w-80 space-y-4">
-            {/* Character Stats */}
+            {/* Tabs for different views */}
             <Card className="panel-glow bg-card/95 backdrop-blur-sm border-2 border-primary/30 p-4">
-              <h3 className="text-lg font-fantasy text-primary mb-4">Character Stats</h3>
-              <div className="space-y-3">
-                <div className="flex justify-between items-center">
-                  <span className="text-sm text-muted-foreground">Strength</span>
-                  <span className="font-semibold text-primary">
-                    {player.stats.strength}
-                  </span>
-                </div>
-                <div className="flex justify-between items-center">
-                  <span className="text-sm text-muted-foreground">Intelligence</span>
-                  <span className="font-semibold text-primary">
-                    {player.stats.intelligence}
-                  </span>
-                </div>
-                <div className="flex justify-between items-center">
-                  <span className="text-sm text-muted-foreground">Agility</span>
-                  <span className="font-semibold text-primary">
-                    {player.stats.agility}
-                  </span>
-                </div>
-              </div>
+              <Tabs value={activeTab} onValueChange={setActiveTab}>
+                <TabsList className="grid w-full grid-cols-3">
+                  <TabsTrigger value="stats" className="text-xs">
+                    <User className="w-4 h-4 mr-1" />
+                    Stats
+                  </TabsTrigger>
+                  <TabsTrigger value="quests" className="text-xs">
+                    <Target className="w-4 h-4 mr-1" />
+                    Quests
+                  </TabsTrigger>
+                  <TabsTrigger value="map" className="text-xs">
+                    <Map className="w-4 h-4 mr-1" />
+                    Map
+                  </TabsTrigger>
+                </TabsList>
+
+                <TabsContent value="stats" className="mt-4">
+                  <div className="space-y-3">
+                    <div className="flex justify-between items-center">
+                      <span className="text-sm text-muted-foreground">Strength</span>
+                      <span className="font-semibold text-primary">
+                        {player.stats.strength}
+                      </span>
+                    </div>
+                    <div className="flex justify-between items-center">
+                      <span className="text-sm text-muted-foreground">Intelligence</span>
+                      <span className="font-semibold text-primary">
+                        {player.stats.intelligence}
+                      </span>
+                    </div>
+                    <div className="flex justify-between items-center">
+                      <span className="text-sm text-muted-foreground">Agility</span>
+                      <span className="font-semibold text-primary">
+                        {player.stats.agility}
+                      </span>
+                    </div>
+                  </div>
+                </TabsContent>
+
+                <TabsContent value="quests" className="mt-4 max-h-64 overflow-y-auto">
+                  <QuestTracker />
+                </TabsContent>
+
+                <TabsContent value="map" className="mt-4">
+                  <Button
+                    onClick={() => setShowWorldMap(true)}
+                    className="w-full gap-2"
+                  >
+                    <Map className="w-4 h-4" />
+                    Open Full Map
+                  </Button>
+                  <p className="text-xs text-muted-foreground text-center mt-2">
+                    Explore the world and discover new locations
+                  </p>
+                </TabsContent>
+              </Tabs>
             </Card>
 
             {/* Action Buttons */}
