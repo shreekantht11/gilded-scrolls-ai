@@ -1,0 +1,81 @@
+{
+  "app": {
+    "title": "AI Dungeon Master",
+    "subtitle": "Your Epic Adventure Awaits"
+  },
+  "intro": {
+    "title": "AI Dungeon Master",
+    "subtitle": "Your Epic Adventure Awaits",
+    "newGame": "Start New Adventure",
+    "continue": "Continue Adventure",
+    "settings": "Settings"
+  },
+  "character": {
+    "title": "Create Your Character",
+    "name": "Character Name",
+    "namePlaceholder": "Enter your character's name",
+    "class": "Choose Your Class",
+    "gender": "Gender",
+    "classes": {
+      "warrior": "Warrior",
+      "mage": "Mage",
+      "rogue": "Rogue"
+    },
+    "genders": {
+      "male": "Male",
+      "female": "Female",
+      "other": "Other"
+    },
+    "create": "Create Character"
+  },
+  "genre": {
+    "title": "Choose Your Adventure",
+    "fantasy": "Fantasy",
+    "scifi": "Sci-Fi",
+    "mystery": "Mystery",
+    "mythical": "Mythical"
+  },
+  "game": {
+    "level": "Level",
+    "health": "Health",
+    "xp": "XP",
+    "inventory": "Inventory",
+    "log": "Adventure Log",
+    "save": "Save Game",
+    "help": "Help",
+    "settings": "Settings",
+    "exit": "Exit",
+    "combat": "Combat",
+    "quests": "Quests",
+    "map": "Map",
+    "character": "Character",
+    "achievements": "Achievements"
+  },
+  "actions": {
+    "attack": "Attack",
+    "defend": "Defend",
+    "useItem": "Use Item",
+    "run": "Run",
+    "jump": "Jump"
+  },
+  "settings": {
+    "title": "Settings",
+    "language": "Language",
+    "textSpeed": "Text Speed",
+    "sound": "Sound Effects",
+    "music": "Background Music",
+    "accessibility": "Accessibility",
+    "fontSize": "Font Size",
+    "highContrast": "High Contrast Mode",
+    "back": "Back to Game"
+  },
+  "messages": {
+    "gameSaved": "Game saved successfully!",
+    "gameLoaded": "Game loaded successfully!",
+    "levelUp": "Level Up! You are now level {{level}}",
+    "itemReceived": "Received: {{item}}",
+    "questCompleted": "Quest Completed!",
+    "achievementUnlocked": "Achievement Unlocked!",
+    "comingSoon": "Coming soon!"
+  }
+}

@@ -61,6 +61,14 @@ interface GameState {
   inCombat: boolean;
   currentEnemy: Enemy | null;
   
+  // Quests
+  activeQuests: any[];
+  completedQuests: any[];
+  
+  // World
+  currentLocation: string;
+  discoveredLocations: string[];
+  
   // Settings
   language: 'English' | 'Kannada' | 'Telugu';
   textSpeed: number;
@@ -95,6 +103,10 @@ const initialState = {
   playerChoices: [],
   inCombat: false,
   currentEnemy: null,
+  activeQuests: [],
+  completedQuests: [],
+  currentLocation: 'village',
+  discoveredLocations: ['village'],
   language: 'English' as const,
   textSpeed: 50,
   soundEnabled: true,
