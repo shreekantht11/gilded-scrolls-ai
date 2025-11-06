@@ -1,6 +1,8 @@
-# AI Dungeon Master 🎮
+# 🎮 Gilded Scrolls – AI Dungeon Master
 
-An immersive, AI-powered text-based adventure game with dynamic story generation, turn-based combat, and character progression. Built with React, TypeScript, and powered by Google Gemini AI.
+**An immersive AI-powered text-based RPG built with the MERN stack**
+
+Create your hero, choose your genre, and embark on dynamically generated adventures powered by OpenAI GPT models. Every choice matters, every story is unique.
 
 ## 🌟 Features
 
@@ -23,12 +25,12 @@ An immersive, AI-powered text-based adventure game with dynamic story generation
 - 🔔 **Achievement Notifications** - Real-time unlock celebrations
 - 📤 **Social Sharing** - Share your adventure on social media
 
-### 🚧 Backend Required
-- 🤖 **AI Story Generation** - Dynamic narratives with Google Gemini
-- 💾 **Cloud Save System** - MongoDB integration for persistent storage
+### ✅ Backend Implemented (Express.js)
+- 🤖 **AI Story Generation** - OpenAI GPT-powered dynamic narratives
+- 💾 **MongoDB Integration** - Persistent game saves and user data
+- ⚔️ **Combat Engine** - Server-side damage calculation
 - 🎲 **Dynamic Enemy Generation** - AI-powered encounters
-- 🖼️ **Image Generation** - Character/scene illustrations (DALL-E/SD)
-- 🎵 **Audio System** - Background music and sound effects (hooks ready)
+- 🔐 **Security** - Rate limiting, input validation, CORS protection
 
 ## 🚀 Quick Start
 
@@ -47,52 +49,41 @@ npm run build
 
 The app will be available at `http://localhost:5173`
 
-## 🔧 Backend Development Guide
+## 🔧 Backend Setup (Express.js)
 
 ### Prerequisites
-- Python 3.10+
-- MongoDB Atlas account (free tier)
-- Google Gemini API key ([Get it here](https://makersuite.google.com/app/apikey))
-- Optional: DALL-E API key for image generation
+- Node.js 18+
+- MongoDB (local or Atlas)
+- OpenAI API key ([Get it here](https://platform.openai.com/api-keys))
 
 ### Backend Setup
 
-1. **Create `.env` file** in the root directory:
-
-```env
-# Google Gemini AI
-GEMINI_API_KEY=your_gemini_api_key_here
-
-# MongoDB
-MONGODB_URI=mongodb+srv://username:password@cluster.mongodb.net/ai-dungeon-master
-
-# Optional: Image Generation
-OPENAI_API_KEY=your_openai_api_key_here
-
-# Server Config
-PORT=8000
-CORS_ORIGIN=http://localhost:5173
-```
-
-2. **Install Python dependencies**:
+1. **Navigate to backend directory and install dependencies:**
 
 ```bash
 cd backend
-pip install -r requirements.txt
+npm install
 ```
 
-Create `backend/requirements.txt`:
-```txt
-fastapi==0.109.0
-uvicorn[standard]==0.27.0
-pymongo==4.6.1
-python-dotenv==1.0.0
-google-generativeai==0.3.2
-pydantic==2.5.3
-openai==1.10.0
-motor==3.3.2
-python-multipart==0.0.6
+2. **Create `.env` file** in the `backend/` directory:
+
+```env
+PORT=8000
+MONGODB_URI=mongodb://localhost:27017/gilded-scrolls
+OPENAI_API_KEY=sk-your-openai-api-key-here
+NODE_ENV=development
+FRONTEND_URL=http://localhost:5173
 ```
+
+3. **Start the backend server:**
+
+```bash
+npm run dev  # Development mode with auto-reload
+# or
+npm start    # Production mode
+```
+
+Backend runs on `http://localhost:8000`
 
 3. **MongoDB Schema Design**:
 
@@ -142,14 +133,10 @@ python-multipart==0.0.6
 }
 ```
 
-4. **Run Backend Server**:
+## 📚 Complete Documentation
 
-```bash
-cd backend
-python app.py
-```
-
-Server runs at `http://localhost:8000`
+- **Backend API Reference:** See `backend/README.md` for all API endpoints, request/response examples, and MongoDB schemas
+- **Deployment Guide:** See `DEPLOYMENT.md` for step-by-step deployment to Railway/Render/Heroku
 
 ### API Endpoints
 
